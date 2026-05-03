@@ -10,7 +10,7 @@ a = Analysis(
     ['whispr_ptt.py'],
     pathex=[],
     binaries=[],
-    datas=[],
+    datas=[('whisprPTT.png', '.')],
     hiddenimports=[
         'faster_whisper',
         'ctranslate2',
@@ -20,6 +20,10 @@ a = Analysis(
         'pynput.keyboard._win32',
         'huggingface_hub',
         'tokenizers',
+        'pystray',
+        'pystray._win32',
+        'PIL',
+        'PIL.Image',
     ],
     hookspath=[],
     hooksconfig={},
@@ -46,8 +50,8 @@ exe = EXE(
     bootloader_ignore_signals=False,
     strip=False,
     upx=False,
-    console=True,
-    icon=None,
+    console=False,
+    icon='whisprPTT.ico',
 )
 
 coll = COLLECT(
