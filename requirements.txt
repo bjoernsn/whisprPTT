@@ -1,0 +1,4 @@
+faster-whisper==1.2.1
+numpy==2.4.3
+PyAudio==0.2.14
+pynput==1.8.1
