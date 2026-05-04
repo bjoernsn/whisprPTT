@@ -19,7 +19,7 @@ from pynput import keyboard, mouse
 # Constants
 # ---------------------------------------------------------------------------
 
-DEVICE = "auto"          # "cuda" for GPU, "cpu" to force CPU, "auto" to detect
+DEVICE = "cpu"           # "cuda" for GPU, "cpu" for CPU, "auto" to detect (requires CUDA 12)
 COMPUTE_TYPE = "int8"    # "int8" (fast/low RAM), "float16" (GPU), "float32" (accurate)
 SAMPLE_RATE = 16000
 CHANNELS = 1
@@ -164,8 +164,12 @@ def _model_name(lang: str | None) -> str:
 
 def _load_model(lang: str | None) -> WhisperModel:
     name = _model_name(lang)
-    log.info("Loading model %s", name)
-    model = WhisperModel(name, device=DEVICE, compute_type=COMPUTE_TYPE)
+    log.info("Loading model %s (device=%s)", name, DEVICE)
+    try:
+        model = WhisperModel(name, device=DEVICE, compute_type=COMPUTE_TYPE)
+    except Exception:
+        log.warning("Failed to load on device=%s, falling back to CPU", DEVICE)
+        model = WhisperModel(name, device="cpu", compute_type="int8")
     log.info("Model %s ready", name)
     return model
 
