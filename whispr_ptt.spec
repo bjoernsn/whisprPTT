@@ -13,7 +13,10 @@ a = Analysis(
         # ffi.dll is required by _ctypes.pyd but not auto-detected by PyInstaller
         (r'C:\Users\bjoer\anaconda3\Library\bin\ffi.dll', '.'),
     ],
-    datas=[('whisprPTT.png', '.')],
+    datas=[
+        ('whisprPTT.png', '.'),
+        (os.path.join(site_packages, 'faster_whisper', 'assets'), 'faster_whisper/assets'),
+    ],
     hiddenimports=[
         'faster_whisper',
         'ctranslate2',
