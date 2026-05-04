@@ -1,6 +1,6 @@
 @echo off
 echo ============================================
-echo  WhisperPTT - Build
+echo  WhisprPTT - Build
 echo ============================================
 echo.
 

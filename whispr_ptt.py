@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""WhisperPTT — push-to-talk local speech dictation. Tray app, no console window."""
+"""WhisprPTT — push-to-talk local speech dictation. Tray app, no console window."""
 
 import json
 import logging
@@ -207,7 +207,7 @@ class PushToTalkRecorder:
     # -- Status ---------------------------------------------------------------
 
     def _status(self, text: str):
-        self.tray.title = f"Whisper PTT — {text}"
+        self.tray.title = f"Whispr PTT — {text}"
 
     # -- Model hot-swap -------------------------------------------------------
 
@@ -402,12 +402,12 @@ def main():
             print(f"[{idx}]  {name}")
         return
 
-    log.info("=== WhisperPTT starting ===")
+    log.info("=== WhisprPTT starting ===")
     config = Config()
     mics = list_mics()
 
     icon_image = Image.open(_asset_path("whisprPTT.png"))
-    tray = pystray.Icon("WhisperPTT", icon_image, "Whisper PTT — Loading model...")
+    tray = pystray.Icon("WhisprPTT", icon_image, "Whispr PTT — Loading model...")
 
     model = _load_model(config.language)
     recorder = PushToTalkRecorder(model, config, tray)

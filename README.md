@@ -1,7 +1,7 @@
-# WhisperPTT
+# WhisprPTT
 
 <p align="center">
-  <img src="whisprPTT.png" width="160" alt="WhisperPTT logo">
+  <img src="whisprPTT.png" width="160" alt="WhisprPTT logo">
 </p>
 
 <p align="center">
@@ -18,7 +18,7 @@
 3. Release — your words are transcribed and typed at wherever your cursor is
 4. Works in any app: browsers, editors, chat, email, terminals
 
-WhisperPTT sits silently in your system tray. Right-click the icon to change settings or quit.
+WhisprPTT sits silently in your system tray. Right-click the icon to change settings or quit.
 
 ---
 
@@ -33,7 +33,7 @@ WhisperPTT sits silently in your system tray. Right-click the icon to change set
 
 > **SmartScreen warning:** Windows may show "Windows protected your PC" the first time. Click **More info → Run anyway**. This is standard for unsigned open-source apps.
 
-> **First run:** WhisperPTT downloads the Whisper speech model (~240 MB) on first launch. This happens once and is cached for all future runs.
+> **First run:** WhisprPTT downloads the Whisper speech model (~240 MB) on first launch. This happens once and is cached for all future runs.
 
 ### Option B — Run from source
 
@@ -70,7 +70,7 @@ There is no prebuilt `.app` yet for macOS. You need to run from source.
 
 ### 1. Install system dependencies
 
-WhisperPTT uses PyAudio for microphone access, which requires PortAudio:
+WhisprPTT uses PyAudio for microphone access, which requires PortAudio:
 
 ```bash
 # Install Homebrew if you don't have it
@@ -93,7 +93,7 @@ pip install -r requirements.txt
 
 ### 3. Grant permissions
 
-macOS requires two permissions for WhisperPTT to work. You'll be prompted automatically on first run, but you can also set them in advance:
+macOS requires two permissions for WhisprPTT to work. You'll be prompted automatically on first run, but you can also set them in advance:
 
 **Accessibility** (required to monitor keypresses and type text):
 > System Settings → Privacy & Security → Accessibility → add Terminal (or your Python app)

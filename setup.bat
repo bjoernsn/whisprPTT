@@ -1,6 +1,6 @@
 @echo off
 echo ============================================
-echo  WhisperPTT - Setup
+echo  WhisprPTT - Setup
 echo ============================================
 echo.
 
