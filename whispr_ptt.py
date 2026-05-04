@@ -263,28 +263,28 @@ class PushToTalkRecorder:
     # -- Transcription --------------------------------------------------------
 
     def _transcribe_and_type(self, frames: list[bytes]):
-        audio_bytes = b"".join(frames)
-        audio_np = np.frombuffer(audio_bytes, dtype=np.int16)
+        try:
+            audio_bytes = b"".join(frames)
+            audio_np = np.frombuffer(audio_bytes, dtype=np.int16)
 
-        if np.mean(np.abs(audio_np)) < HALLUCINATE_THRESHOLD:
+            if np.mean(np.abs(audio_np)) < HALLUCINATE_THRESHOLD:
+                return
+
+            audio_float = audio_np.astype(np.float32) / 32768.0
+
+            with self._model_lock:
+                segments, _ = self._model.transcribe(
+                    audio_float,
+                    beam_size=1,
+                    vad_filter=True,
+                    language=self.config.language,
+                )
+                text = "".join(seg.text for seg in segments).strip()
+
+            if text:
+                self.typer.type(text)
+        finally:
             self._status("Ready")
-            return
-
-        audio_float = audio_np.astype(np.float32) / 32768.0
-
-        with self._model_lock:
-            segments, _ = self._model.transcribe(
-                audio_float,
-                beam_size=1,
-                vad_filter=True,
-                language=self.config.language,
-            )
-            text = "".join(seg.text for seg in segments).strip()
-
-        if text:
-            self.typer.type(text)
-
-        self._status("Ready")
 
     # -- Run ------------------------------------------------------------------
 
