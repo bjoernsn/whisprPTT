@@ -308,43 +308,46 @@ def _radio(label: str, action, is_checked) -> pystray.MenuItem:
 
 def build_menu(recorder: PushToTalkRecorder, config: Config, mics: list[tuple]) -> pystray.Menu:
 
+    def _make_mic_action(i):
+        def action(icon, item): config.mic_index = i
+        return action
+
+    def _make_lang_action(c):
+        def action(icon, item):
+            if config.language != c:
+                config.language = c
+                threading.Thread(target=recorder.reload_model, args=(c,), daemon=True).start()
+        return action
+
+    def _make_set_action(attr, val):
+        def action(icon, item): setattr(config, attr, val)
+        return action
+
     # Microphone submenu
     mic_items = []
     for idx, name in mics:
         display = "System default" if idx is None else f"[{idx}]  {name[:45]}"
-        def _mic_action(icon, item, i=idx):
-            config.mic_index = i
-        mic_items.append(_radio(display, _mic_action, lambda item, i=idx: config.mic_index == i))
+        mic_items.append(_radio(display, _make_mic_action(idx), lambda item, i=idx: config.mic_index == i))
 
     # Language submenu
     lang_items = []
     for label, code in LANGUAGE_OPTIONS.items():
-        def _lang_action(icon, item, c=code):
-            if config.language != c:
-                config.language = c
-                threading.Thread(target=recorder.reload_model, args=(c,), daemon=True).start()
-        lang_items.append(_radio(label, _lang_action, lambda item, c=code: config.language == c))
+        lang_items.append(_radio(label, _make_lang_action(code), lambda item, c=code: config.language == c))
 
     # Hotkey submenu
     hotkey_items = []
     for label in HOTKEY_OPTIONS:
-        def _hotkey_action(icon, item, lbl=label):
-            config.hotkey = lbl
-        hotkey_items.append(_radio(label, _hotkey_action, lambda item, lbl=label: config.hotkey == lbl))
+        hotkey_items.append(_radio(label, _make_set_action("hotkey", label), lambda item, lbl=label: config.hotkey == lbl))
 
     # Record mouse button submenu
     mouse_items = []
     for label in MOUSE_OPTIONS:
-        def _mouse_action(icon, item, lbl=label):
-            config.mouse_button = lbl
-        mouse_items.append(_radio(label, _mouse_action, lambda item, lbl=label: config.mouse_button == lbl))
+        mouse_items.append(_radio(label, _make_set_action("mouse_button", label), lambda item, lbl=label: config.mouse_button == lbl))
 
     # Enter mouse button submenu
     enter_items = []
     for label in MOUSE_OPTIONS:
-        def _enter_action(icon, item, lbl=label):
-            config.enter_button = lbl
-        enter_items.append(_radio(label, _enter_action, lambda item, lbl=label: config.enter_button == lbl))
+        enter_items.append(_radio(label, _make_set_action("enter_button", label), lambda item, lbl=label: config.enter_button == lbl))
 
     return pystray.Menu(
         pystray.MenuItem("Microphone",    pystray.Menu(*mic_items)),
