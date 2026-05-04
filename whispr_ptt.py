@@ -42,10 +42,11 @@ MOUSE_OPTIONS: dict[str, mouse.Button | None] = {
 }
 
 LANGUAGE_OPTIONS: dict[str, str | None] = {
-    "English":     "en",
-    "German":      "de",
-    "French":      "fr",
-    "Spanish":     "es",
+    "English":    "en",
+    "German":     "de",
+    "French":     "fr",
+    "Indonesian": "id",
+    "Spanish":    "es",
     "Auto-detect": None,
 }
 

@@ -126,7 +126,7 @@ Right-click the tray icon to access all settings. Changes take effect immediatel
 | Menu | Options | Default |
 |---|---|---|
 | **Microphone** | All detected input devices + System default | System default |
-| **Language** | English, German, French, Spanish, Auto-detect | English |
+| **Language** | English, German, French, Indonesian, Spanish, Auto-detect | English |
 | **Hotkey** | Right Ctrl, Left Ctrl, Right Alt, Right Shift, Caps Lock, Scroll Lock | Right Ctrl |
 | **Record Button** | X2 (Forward thumb), X1 (Back thumb), Middle button, Disabled | X2 (Forward thumb) |
 | **Enter Button** | X2 (Forward thumb), X1 (Back thumb), Middle button, Disabled | X1 (Back thumb) |
