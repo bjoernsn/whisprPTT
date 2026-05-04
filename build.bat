@@ -36,7 +36,7 @@ del whisprPTT.ico >nul 2>&1
 echo.
 echo ============================================
 echo  Build complete!
-echo  Executable: dist\whispr\whispr.exe
-echo  Zip the dist\whispr\ folder to share it.
+echo  Executable: dist\whispr-ptt\whispr-ptt.exe
+echo  Zip the dist\whispr-ptt\ folder to share it.
 echo ============================================
 pause

@@ -9,7 +9,10 @@ site_packages = os.path.join('.venv', 'Lib', 'site-packages')
 a = Analysis(
     ['whispr_ptt.py'],
     pathex=[],
-    binaries=[],
+    binaries=[
+        # ffi.dll is required by _ctypes.pyd but not auto-detected by PyInstaller
+        (r'C:\Users\bjoer\anaconda3\Library\bin\ffi.dll', '.'),
+    ],
     datas=[('whisprPTT.png', '.')],
     hiddenimports=[
         'faster_whisper',
@@ -45,7 +48,7 @@ exe = EXE(
     a.scripts,
     [],
     exclude_binaries=True,
-    name='whispr',
+    name='whispr-ptt',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
@@ -61,5 +64,5 @@ coll = COLLECT(
     strip=False,
     upx=False,
     upx_exclude=[],
-    name='whispr',
+    name='whispr-ptt',
 )
