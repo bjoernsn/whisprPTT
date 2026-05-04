@@ -54,6 +54,7 @@ DEFAULT_CONFIG: dict = {
     "language":     "en",
     "hotkey":       "Right Ctrl",
     "mouse_button": "X2 (Forward thumb)",
+    "enter_button": "X1 (Back thumb)",
 }
 
 # ---------------------------------------------------------------------------
@@ -124,6 +125,15 @@ class Config:
     @mouse_button.setter
     def mouse_button(self, v: str):
         self._data["mouse_button"] = v
+        self.save()
+
+    @property
+    def enter_button(self) -> str:
+        return self._data.get("enter_button", DEFAULT_CONFIG["enter_button"])
+
+    @enter_button.setter
+    def enter_button(self, v: str):
+        self._data["enter_button"] = v
         self.save()
 
 # ---------------------------------------------------------------------------
@@ -236,12 +246,18 @@ class PushToTalkRecorder:
             self._stop_recording()
 
     def on_click(self, x, y, button, pressed):
-        target = MOUSE_OPTIONS.get(self.config.mouse_button)
-        if target is not None and button == target:
+        record_btn = MOUSE_OPTIONS.get(self.config.mouse_button)
+        if record_btn is not None and button == record_btn:
             if pressed:
                 self._start_recording()
             else:
                 self._stop_recording()
+            return
+
+        enter_btn = MOUSE_OPTIONS.get(self.config.enter_button)
+        if enter_btn is not None and button == enter_btn and pressed:
+            self.typer.press(keyboard.Key.enter)
+            self.typer.release(keyboard.Key.enter)
 
     # -- Transcription --------------------------------------------------------
 
@@ -315,18 +331,26 @@ def build_menu(recorder: PushToTalkRecorder, config: Config, mics: list[tuple]) 
             config.hotkey = lbl
         hotkey_items.append(_radio(label, _hotkey_action, lambda item, lbl=label: config.hotkey == lbl))
 
-    # Mouse button submenu
+    # Record mouse button submenu
     mouse_items = []
     for label in MOUSE_OPTIONS:
         def _mouse_action(icon, item, lbl=label):
             config.mouse_button = lbl
         mouse_items.append(_radio(label, _mouse_action, lambda item, lbl=label: config.mouse_button == lbl))
 
+    # Enter mouse button submenu
+    enter_items = []
+    for label in MOUSE_OPTIONS:
+        def _enter_action(icon, item, lbl=label):
+            config.enter_button = lbl
+        enter_items.append(_radio(label, _enter_action, lambda item, lbl=label: config.enter_button == lbl))
+
     return pystray.Menu(
         pystray.MenuItem("Microphone",    pystray.Menu(*mic_items)),
         pystray.MenuItem("Language",      pystray.Menu(*lang_items)),
         pystray.MenuItem("Hotkey",        pystray.Menu(*hotkey_items)),
-        pystray.MenuItem("Mouse Button",  pystray.Menu(*mouse_items)),
+        pystray.MenuItem("Record Button", pystray.Menu(*mouse_items)),
+        pystray.MenuItem("Enter Button",  pystray.Menu(*enter_items)),
         pystray.Menu.SEPARATOR,
         pystray.MenuItem("Quit", lambda icon, item: icon.stop()),
     )
