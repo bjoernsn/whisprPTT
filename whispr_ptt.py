@@ -2,6 +2,8 @@
 """WhisperPTT — push-to-talk local speech dictation. Tray app, no console window."""
 
 import json
+import logging
+import logging.handlers
 import os
 import sys
 import threading
@@ -66,9 +68,24 @@ def _asset_path(filename: str) -> str:
     base = sys._MEIPASS if getattr(sys, "frozen", False) else os.path.dirname(os.path.abspath(__file__))
     return os.path.join(base, filename)
 
-def _config_path() -> str:
+def _data_path(filename: str) -> str:
     base = os.path.dirname(sys.executable) if getattr(sys, "frozen", False) else os.path.dirname(os.path.abspath(__file__))
-    return os.path.join(base, "config.json")
+    return os.path.join(base, filename)
+
+def _config_path() -> str:
+    return _data_path("config.json")
+
+def _setup_logging() -> logging.Logger:
+    log = logging.getLogger("whispr")
+    log.setLevel(logging.DEBUG)
+    handler = logging.handlers.RotatingFileHandler(
+        _data_path("whispr-ptt.log"), maxBytes=500_000, backupCount=1, encoding="utf-8"
+    )
+    handler.setFormatter(logging.Formatter("%(asctime)s %(levelname)s %(message)s"))
+    log.addHandler(handler)
+    return log
+
+log = _setup_logging()
 
 # ---------------------------------------------------------------------------
 # Config
@@ -146,7 +163,11 @@ def _model_name(lang: str | None) -> str:
     return "small.en" if lang == "en" else "small"
 
 def _load_model(lang: str | None) -> WhisperModel:
-    return WhisperModel(_model_name(lang), device=DEVICE, compute_type=COMPUTE_TYPE)
+    name = _model_name(lang)
+    log.info("Loading model %s", name)
+    model = WhisperModel(name, device=DEVICE, compute_type=COMPUTE_TYPE)
+    log.info("Model %s ready", name)
+    return model
 
 # ---------------------------------------------------------------------------
 # Mic enumeration
@@ -216,6 +237,7 @@ class PushToTalkRecorder:
                 stream_callback=self._audio_callback,
             )
             self._status("Recording...")
+            log.info("Recording started")
 
     def _stop_recording(self):
         with self._rec_lock:
@@ -229,6 +251,7 @@ class PushToTalkRecorder:
             captured = self.frames
             self.frames = []
 
+        log.info("Recording stopped — %d chunks captured", len(captured))
         if not captured:
             self._status("Ready")
             return
@@ -266,8 +289,11 @@ class PushToTalkRecorder:
         try:
             audio_bytes = b"".join(frames)
             audio_np = np.frombuffer(audio_bytes, dtype=np.int16)
+            amplitude = np.mean(np.abs(audio_np))
+            log.info("Audio amplitude: %.1f (threshold: %d)", amplitude, HALLUCINATE_THRESHOLD)
 
-            if np.mean(np.abs(audio_np)) < HALLUCINATE_THRESHOLD:
+            if amplitude < HALLUCINATE_THRESHOLD:
+                log.info("Skipped — below silence threshold")
                 return
 
             audio_float = audio_np.astype(np.float32) / 32768.0
@@ -281,8 +307,11 @@ class PushToTalkRecorder:
                 )
                 text = "".join(seg.text for seg in segments).strip()
 
+            log.info("Transcribed: %r", text)
             if text:
                 self.typer.type(text)
+        except Exception:
+            log.exception("Transcription error")
         finally:
             self._status("Ready")
 
@@ -369,6 +398,7 @@ def main():
             print(f"[{idx}]  {name}")
         return
 
+    log.info("=== WhisperPTT starting ===")
     config = Config()
     mics = list_mics()
 
